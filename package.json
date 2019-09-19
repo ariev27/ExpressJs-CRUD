@@ -1,0 +1,21 @@
+{
+    "name": "expressjs-crud",
+    "version": "0.0.0",
+    "private": true,
+    "scripts": {
+        "start": "npm ./bin/www",
+        "startNodemon": "nodemon ./bin/www"
+    },
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "cookie-parser": "~1.4.4",
+        "cors": "^2.8.5",
+        "debug": "~4.1.1",
+        "express": "^4.17.1",
+        "http-errors": "~1.7.3",
+        "jade": "~1.11.0",
+        "morgan": "~1.9.1",
+        "mysql": "^2.17.1",
+        "nodemon": "^1.19.2"
+    }
+}
