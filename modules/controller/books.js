@@ -1,32 +1,29 @@
-var DBUtil = require("../util/DBUtil");
+var books = require("../../models/books");
 var jsonResult = require("../util/JsonUtil");
 
 var booksController = function() {};
 
 booksController.getAll = function(req, res, next) {
-  DBUtil.query("SELECT * FROM books", function(error, result) {
-    if (error) {
-      res.json(jsonResult(404, error));
-    } else {
-      res.json(jsonResult(200, "Get books success", result));
-    }
-  });
+  books
+    .findAll()
+    .then(result => {
+      res.json(jsonResult(200, "Get all books success", result));
+    })
+    .catch(err => {
+      res.json(jsonResult(500, err));
+    });
 };
 
 booksController.getByBookId = function(req, res, next) {
   const bookId = req.params.bookId;
-  DBUtil.query("SELECT * FROM books WHERE bookId = ?", bookId, function(
-    error,
-    result
-  ) {
-    if (error) {
-      res.json(jsonResult(500, error));
-    } else if (result == "") {
-      res.json(jsonResult(404, "Book with bookId " + bookId + " not found"));
-    } else {
-      res.json(jsonResult(200, "Get book success", result));
-    }
-  });
+  books
+    .findByPk(bookId)
+    .then(result => {
+      res.json(result);
+    })
+    .catch(err => {
+      res.json(jsonResult(500, err));
+    });
 };
 
 booksController.postBook = function(req, res, next) {
@@ -37,13 +34,15 @@ booksController.postBook = function(req, res, next) {
     price: req.body.price,
     stock: req.body.stock
   };
-  DBUtil.query("INSERT INTO books SET ?", data, function(error) {
-    if (error) {
-      res.json(jsonResult(404, error));
-    } else {
-      res.json(jsonResult(200, "Insert book success", data));
-    }
-  });
+
+  books
+    .create(data)
+    .then(result => {
+      res.json(jsonResult(200, "Post book success", result));
+    })
+    .catch(err => {
+      res.json(jsonResult(500, err));
+    });
 };
 
 booksController.putBook = function(req, res, next) {
@@ -54,36 +53,61 @@ booksController.putBook = function(req, res, next) {
     price: req.body.price,
     stock: req.body.stock
   };
-  DBUtil.query("UPDATE books SET ? WHERE bookId = ?", [data, bookId], function(
-    error,
-    result
-  ) {
-    if (error) {
-      res.json(jsonResult(404, error));
-    } else {
-      res.json(
-        jsonResult(200, "Update book with bookId " + bookId + " success", data)
-      );
-    }
-  });
+
+  books
+    .findByPk(bookId)
+    .then(result => {
+      console.log("Result " + JSON.stringify(result));
+      if (result) {
+        return result.update(data);
+      } else {
+        throw Error("BookId " + bookId + " not found on database");
+        // res.json(jsonResult(404, 'BookId ' + bookId + ' not found on database'))
+      }
+    })
+    .then(result => {
+      res.json(jsonResult(200, "Book update success", result));
+    })
+    .catch(err => {
+      res.json(jsonResult(500, err.message));
+    });
+
+  //Versi update static, tipe kembaliannya affected rows
+  // books.update(data, {where: {bookId: bookId}}).then((result) => {
+  //     console.log("result " + JSON.stringify(result));
+  //     console.log("result " + JSON.stringify(result[0]));
+  //     if (result[0] == 0) {
+  //         res.json(jsonResult(404, 'BookId not found'))
+  //     } else {
+  //         res.json(jsonResult(200, 'Update book success', data))
+  //     }
+  // }).catch((err) => {
+  //     res.json(jsonResult(500, err))
+  // })
 };
 
 booksController.deleteByBookId = function(req, res, next) {
   let bookId = req.params.bookId;
-  DBUtil.query("DELETE FROM books WHERE bookId = ?", bookId, function(
-    error,
-    result
-  ) {
-    if (error) {
-      res.json(jsonResult(500, error));
-    } else if (result.affectedRows == 0) {
-      res.json(jsonResult(404, "Book with bookId " + bookId + " not found"));
-    } else {
-      res.json(
-        jsonResult(200, "Delete book with bookId " + bookId + " success")
-      );
-    }
-  });
+  books
+    .destroy({ where: { bookId: bookId } })
+    .then(result => {
+      console.log(result);
+      if (result == 0) {
+        res.json(
+          jsonResult(
+            404,
+            "Book with bookId " + bookId + " not found on database"
+          )
+        );
+      } else {
+        res.json(
+          jsonResult(200, "Delete book with bookId " + bookId + " success")
+        );
+      }
+    })
+    .catch(err => {
+      res.json(jsonResult(500, err));
+    });
 };
 
 module.exports = booksController;

@@ -1,14 +1,12 @@
-var mysql = require("mysql");
+const Sequelize = require("sequelize");
 
-var connection = mysql.createConnection({
+// Option 1: Passing parameters separately
+const sequelize = new Sequelize("ar_bootcamp", "root", "root", {
   host: "localhost",
-  user: "root",
-  password: "root",
-  database: "ar_bootcamp"
+  dialect: "mysql" /* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */
 });
 
-connection.connect(function(err) {
-  if (err) throw err;
-});
+// Option 2: Passing a connection URI
+// const sequelize = new Sequelize('mysql://user:pass@example.com:5432/dbname');
 
-module.exports = connection;
+module.exports = sequelize;
