@@ -3,7 +3,7 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-        "start": "npm ./bin/www",
+        "start": "npm start",
         "startNodemon": "nodemon ./bin/www"
     },
     "dependencies": {
@@ -15,7 +15,7 @@
         "http-errors": "~1.7.3",
         "jade": "~1.11.0",
         "morgan": "~1.9.1",
-        "mysql": "^2.17.1",
+        "mysql2": "^1.7.0",
         "nodemon": "^1.19.2"
     }
 }
